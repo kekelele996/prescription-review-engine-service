@@ -1,0 +1,37 @@
+package constants
+
+// 日志格式模板集中定义，所有 handler/service/middleware 统一引用（≥25 条）。
+// 业务字段变更时必须同步修改对应模板与调用处（屎山耦合点）。
+const (
+	LogServerStarted        = "HTTP 服务已启动 port=%s mode=%s"
+	LogServerStopped        = "HTTP 服务已优雅退出"
+	LogDBInitFailed         = "数据库初始化失败: %v"
+	LogRedisUnavailable     = "Redis 不可用，限流/队列降级: %v"
+	LogSeedCompleted        = "种子数据初始化完成 admin=%s drugs=%d interactions=%d"
+	LogRequestDone          = "请求处理完成 method=%s path=%s status=%d request_id=%s latency_ms=%d"
+	LogPanicRecovered       = "panic 已恢复 path=%s request_id=%s panic=%v"
+	LogRateLimited          = "触发限流 ip=%s path=%s"
+	LogLoginSuccess         = "登录成功 username=%s role=%s request_id=%s"
+	LogLoginFailed          = "登录失败 username=%s reason=%v"
+	LogRegisterSuccess      = "注册成功 user_id=%d username=%s role=%s"
+	LogUserCreated          = "创建用户成功 user_id=%d username=%s role=%s operator=%s"
+	LogUserUpdated          = "更新用户成功 user_id=%d status=%s operator=%s"
+	LogUserDisabled         = "禁用用户 user_id=%d operator=%s"
+	LogUserEnabled          = "启用用户 user_id=%d operator=%s"
+	LogDrugCreated          = "创建药品成功 drug_id=%d name=%s status=%s operator=%s"
+	LogDrugUpdated          = "更新药品成功 drug_id=%d name=%s operator=%s"
+	LogDrugDisabled         = "停用药品 drug_id=%d name=%s operator=%s"
+	LogDrugEnabled          = "启用药品 drug_id=%d name=%s operator=%s"
+	LogInteractionCreated   = "创建相互作用规则成功 rule_id=%d drug_a=%d drug_b=%d risk=%s operator=%s"
+	LogInteractionDeleted   = "删除相互作用规则 rule_id=%d operator=%s"
+	LogPrescriptionSubmitted = "处方接收成功 prescription_id=%d no=%s format=%s status=%s operator=%s"
+	LogPrescriptionReviewStart = "开始审核处方 prescription_id=%d no=%s"
+	LogPrescriptionReviewed = "处方审核完成 prescription_id=%d status=%s risk=%s items=%d"
+	LogPrescriptionOverridden = "处方强制通过 prescription_id=%d no=%s reason=%s operator=%s"
+	LogReportExported       = "审核报告导出成功 prescription_id=%d object=%s"
+	LogQueueEnqueueFailed   = "审核任务入队失败，降级同步审核 prescription_id=%d err=%v"
+	LogQueueProcessed       = "审核任务处理完成 prescription_id=%d status=%s"
+	LogQueueAckFailed       = "审核任务确认失败 prescription_id=%d err=%v"
+	LogMinioUploadFailed    = "报告快照上传 MinIO 失败 prescription_id=%d err=%v"
+	LogAuditWriteFailed     = "审计日志写入失败 request_id=%s err=%v"
+)

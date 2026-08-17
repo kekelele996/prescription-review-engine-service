@@ -1,0 +1,101 @@
+name: rxcheck
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: ${COMPOSE_PROJECT_NAME:-rxcheck}-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-rxcheck_db}
+      POSTGRES_USER: ${DB_USER:-rxcheck_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-rxcheck_pwd}
+      TZ: Asia/Shanghai
+    ports:
+      - "${DB_PORT:-44018}:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-rxcheck_user} -d ${DB_NAME:-rxcheck_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  redis:
+    image: redis:7-alpine
+    container_name: ${COMPOSE_PROJECT_NAME:-rxcheck}-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "${REDIS_PORT:-46318}:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  minio:
+    image: minio/minio:RELEASE.2024-08-17T01-24-54Z
+    container_name: ${COMPOSE_PROJECT_NAME:-rxcheck}-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-rxcheck_minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-rxcheck_minio_pwd}
+    ports:
+      - "${MINIO_PORT:-47020}:9000"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  backend:
+    build: ./backend
+    container_name: ${COMPOSE_PROJECT_NAME:-rxcheck}-backend
+    restart: unless-stopped
+    environment:
+      SERVER_PORT: "8080"
+      GIN_MODE: release
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_USER: ${DB_USER:-rxcheck_user}
+      DB_PASSWORD: ${DB_PASSWORD:-rxcheck_pwd}
+      DB_NAME: ${DB_NAME:-rxcheck_db}
+      JWT_SECRET: ${JWT_SECRET:-change_me_to_a_long_random_string}
+      API_KEY_SECRET: ${API_KEY_SECRET:-change_me_to_a_long_random_string}
+      REDIS_ADDR: redis:6379
+      REDIS_PASSWORD: ""
+      REDIS_DB: "0"
+      RATE_LIMIT_PER_SECOND: ${RATE_LIMIT_PER_SECOND:-200}
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-rxcheck_minio}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-rxcheck_minio_pwd}
+      MINIO_USE_SSL: "false"
+      MINIO_BUCKET: rxcheck-reports
+    ports:
+      - "${BACKEND_PORT:-19945}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      minio:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/healthz"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  db-data:
+    name: ${COMPOSE_PROJECT_NAME:-rxcheck}-db-data
+  redis-data:
+    name: ${COMPOSE_PROJECT_NAME:-rxcheck}-redis-data
+  minio-data:
+    name: ${COMPOSE_PROJECT_NAME:-rxcheck}-minio-data

@@ -1,0 +1,5 @@
+.env
+backend/server
+*.log
+output/*.png
+.DS_Store

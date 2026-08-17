@@ -1,0 +1,2517 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "处方智能审核引擎 API",
+    "version": "1.0.0",
+    "description": "为医院药房提供处方自动审核服务：适应症、用法用量、药物相互作用、禁忌与特殊人群、重复用药五大审核规则。"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:19945",
+      "description": "本地默认"
+    }
+  ],
+  "tags": [
+    {
+      "name": "系统"
+    },
+    {
+      "name": "认证"
+    },
+    {
+      "name": "用户"
+    },
+    {
+      "name": "药品"
+    },
+    {
+      "name": "相互作用"
+    },
+    {
+      "name": "处方"
+    },
+    {
+      "name": "审核报告"
+    },
+    {
+      "name": "统计"
+    },
+    {
+      "name": "审计"
+    }
+  ],
+  "security": [],
+  "components": {
+    "securitySchemes": {
+      "JWT": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "APIKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key"
+      }
+    },
+    "schemas": {
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {}
+        }
+      },
+      "LoginReq": {
+        "type": "object",
+        "required": [
+          "username",
+          "password"
+        ],
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "RegisterReq": {
+        "type": "object",
+        "required": [
+          "username",
+          "password",
+          "name"
+        ],
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateUserReq": {
+        "type": "object",
+        "required": [
+          "username",
+          "password",
+          "name",
+          "role"
+        ],
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "doctor",
+              "pharmacist"
+            ]
+          }
+        }
+      },
+      "UpdateUserReq": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "disabled"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "doctor",
+              "pharmacist"
+            ]
+          }
+        }
+      },
+      "UserResp": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "username": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          }
+        }
+      },
+      "Indication": {
+        "type": "object",
+        "properties": {
+          "icd10": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "Drug": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "generic_name": {
+            "type": "string"
+          },
+          "specification": {
+            "type": "string"
+          },
+          "atc_code": {
+            "type": "string"
+          },
+          "mechanism": {
+            "type": "string"
+          },
+          "indications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Indication"
+            }
+          },
+          "adult_max_daily_dose": {
+            "type": "number"
+          },
+          "child_max_daily_dose": {
+            "type": "number"
+          },
+          "elderly_max_daily_dose": {
+            "type": "number"
+          },
+          "allergies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "pregnancy_contraindicated": {
+            "type": "boolean"
+          },
+          "hepatic_contraindicated": {
+            "type": "boolean"
+          },
+          "renal_contraindicated": {
+            "type": "boolean"
+          },
+          "beers_flag": {
+            "type": "boolean"
+          },
+          "min_age_months": {
+            "type": "integer"
+          },
+          "frequency_limit": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateDrugReq": {
+        "type": "object",
+        "required": [
+          "name",
+          "generic_name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "generic_name": {
+            "type": "string"
+          },
+          "specification": {
+            "type": "string"
+          },
+          "dosage_form": {
+            "type": "string"
+          },
+          "route": {
+            "type": "string"
+          },
+          "atc_code": {
+            "type": "string"
+          },
+          "mechanism": {
+            "type": "string"
+          },
+          "indications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Indication"
+            }
+          },
+          "adult_max_daily_dose": {
+            "type": "number"
+          },
+          "child_max_daily_dose": {
+            "type": "number"
+          },
+          "elderly_max_daily_dose": {
+            "type": "number"
+          },
+          "max_single_dose": {
+            "type": "number"
+          },
+          "dose_unit": {
+            "type": "string"
+          },
+          "allergies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "pregnancy_contraindicated": {
+            "type": "boolean"
+          },
+          "hepatic_contraindicated": {
+            "type": "boolean"
+          },
+          "renal_contraindicated": {
+            "type": "boolean"
+          },
+          "beers_flag": {
+            "type": "boolean"
+          },
+          "min_age_months": {
+            "type": "integer"
+          },
+          "frequency_limit": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateDrugReq": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "generic_name": {
+            "type": "string"
+          },
+          "specification": {
+            "type": "string"
+          },
+          "dosage_form": {
+            "type": "string"
+          },
+          "route": {
+            "type": "string"
+          },
+          "atc_code": {
+            "type": "string"
+          },
+          "mechanism": {
+            "type": "string"
+          },
+          "indications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Indication"
+            }
+          },
+          "adult_max_daily_dose": {
+            "type": "number"
+          },
+          "child_max_daily_dose": {
+            "type": "number"
+          },
+          "elderly_max_daily_dose": {
+            "type": "number"
+          },
+          "max_single_dose": {
+            "type": "number"
+          },
+          "dose_unit": {
+            "type": "string"
+          },
+          "allergies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "pregnancy_contraindicated": {
+            "type": "boolean"
+          },
+          "hepatic_contraindicated": {
+            "type": "boolean"
+          },
+          "renal_contraindicated": {
+            "type": "boolean"
+          },
+          "beers_flag": {
+            "type": "boolean"
+          },
+          "min_age_months": {
+            "type": "integer"
+          },
+          "frequency_limit": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "InteractionRule": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "drug_a_id": {
+            "type": "integer"
+          },
+          "drug_b_id": {
+            "type": "integer"
+          },
+          "drug_a": {
+            "$ref": "#/components/schemas/Drug"
+          },
+          "drug_b": {
+            "$ref": "#/components/schemas/Drug"
+          },
+          "risk_level": {
+            "type": "string",
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ]
+          },
+          "mechanism": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateInteractionReq": {
+        "type": "object",
+        "required": [
+          "drug_a_id",
+          "drug_b_id",
+          "risk_level",
+          "mechanism",
+          "description"
+        ],
+        "properties": {
+          "drug_a_id": {
+            "type": "integer"
+          },
+          "drug_b_id": {
+            "type": "integer"
+          },
+          "risk_level": {
+            "type": "string",
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ]
+          },
+          "mechanism": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "Diagnosis": {
+        "type": "object",
+        "required": [
+          "icd10",
+          "name"
+        ],
+        "properties": {
+          "icd10": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "PrescriptionItemReq": {
+        "type": "object",
+        "required": [
+          "single_dose",
+          "frequency",
+          "course_days"
+        ],
+        "properties": {
+          "drug_id": {
+            "type": "integer"
+          },
+          "drug_name": {
+            "type": "string"
+          },
+          "specification": {
+            "type": "string"
+          },
+          "single_dose": {
+            "type": "number"
+          },
+          "frequency": {
+            "type": "string",
+            "enum": [
+              "qd",
+              "bid",
+              "tid",
+              "qid",
+              "q8h",
+              "q12h",
+              "qn",
+              "prn"
+            ]
+          },
+          "course_days": {
+            "type": "integer"
+          },
+          "route": {
+            "type": "string"
+          }
+        }
+      },
+      "SubmitPrescriptionReq": {
+        "type": "object",
+        "required": [
+          "prescription_no",
+          "patient_name",
+          "patient_age",
+          "diagnoses",
+          "items"
+        ],
+        "properties": {
+          "prescription_no": {
+            "type": "string"
+          },
+          "patient_name": {
+            "type": "string"
+          },
+          "patient_age": {
+            "type": "integer"
+          },
+          "patient_gender": {
+            "type": "string",
+            "enum": [
+              "male",
+              "female"
+            ]
+          },
+          "weight_kg": {
+            "type": "number"
+          },
+          "allergies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "pregnant": {
+            "type": "boolean"
+          },
+          "hepatic_impairment": {
+            "type": "boolean"
+          },
+          "renal_impairment": {
+            "type": "boolean"
+          },
+          "diagnoses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Diagnosis"
+            }
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrescriptionItemReq"
+            }
+          }
+        }
+      },
+      "PrescriptionItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "drug_id": {
+            "type": "integer"
+          },
+          "drug": {
+            "$ref": "#/components/schemas/Drug"
+          },
+          "drug_name": {
+            "type": "string"
+          },
+          "specification": {
+            "type": "string"
+          },
+          "single_dose": {
+            "type": "number"
+          },
+          "frequency": {
+            "type": "string"
+          },
+          "course_days": {
+            "type": "integer"
+          },
+          "route": {
+            "type": "string"
+          },
+          "daily_dose": {
+            "type": "number"
+          },
+          "suggested_dose": {
+            "type": "number"
+          }
+        }
+      },
+      "ReviewItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "drug_name": {
+            "type": "string"
+          },
+          "rule_type": {
+            "type": "string",
+            "enum": [
+              "indication",
+              "dosage",
+              "interaction",
+              "contraindication",
+              "duplication"
+            ]
+          },
+          "risk_level": {
+            "type": "string",
+            "enum": [
+              "none",
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "suggestion": {
+            "type": "string"
+          },
+          "rule_source": {
+            "type": "string"
+          },
+          "operation": {
+            "type": "string",
+            "enum": [
+              "confirm",
+              "modify",
+              "deny"
+            ]
+          }
+        }
+      },
+      "Report": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "prescription_id": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "passed",
+              "warned",
+              "rejected"
+            ]
+          },
+          "risk_level": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReviewItem"
+            }
+          },
+          "created_at": {
+            "type": "string"
+          }
+        }
+      },
+      "Prescription": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "prescription_no": {
+            "type": "string"
+          },
+          "patient_name": {
+            "type": "string"
+          },
+          "patient_age": {
+            "type": "integer"
+          },
+          "patient_gender": {
+            "type": "string"
+          },
+          "allergies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "pregnant": {
+            "type": "boolean"
+          },
+          "hepatic_impairment": {
+            "type": "boolean"
+          },
+          "renal_impairment": {
+            "type": "boolean"
+          },
+          "diagnoses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Diagnosis"
+            }
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "json",
+              "xml"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending_review",
+              "reviewing",
+              "passed",
+              "warned",
+              "rejected",
+              "overridden"
+            ]
+          },
+          "overall_risk": {
+            "type": "string"
+          },
+          "doctor_id": {
+            "type": "integer"
+          },
+          "override_reason": {
+            "type": "string"
+          },
+          "reviewed_at": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrescriptionItem"
+            }
+          },
+          "report": {
+            "$ref": "#/components/schemas/Report"
+          }
+        }
+      },
+      "PrescriptionListResp": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "prescription_no": {
+            "type": "string"
+          },
+          "patient_name": {
+            "type": "string"
+          },
+          "patient_age": {
+            "type": "integer"
+          },
+          "format": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "overall_risk": {
+            "type": "string"
+          },
+          "item_count": {
+            "type": "integer"
+          },
+          "review_item_count": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "reviewed_at": {
+            "type": "string"
+          }
+        }
+      },
+      "OverrideReq": {
+        "type": "object",
+        "required": [
+          "reason"
+        ],
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "StatsOverview": {
+        "type": "object",
+        "properties": {
+          "total_prescriptions": {
+            "type": "integer"
+          },
+          "by_status": {
+            "type": "object"
+          },
+          "by_risk": {
+            "type": "object"
+          },
+          "total_drugs": {
+            "type": "integer"
+          },
+          "total_interactions": {
+            "type": "integer"
+          }
+        }
+      },
+      "AuditLog": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "user_id": {
+            "type": "integer"
+          },
+          "username": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "module": {
+            "type": "string"
+          },
+          "entity_id": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "ip": {
+            "type": "string"
+          },
+          "request_id": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/healthz": {
+      "get": {
+        "summary": "健康检查",
+        "tags": [
+          "系统"
+        ],
+        "responses": {
+          "200": {
+            "description": "healthy"
+          }
+        }
+      }
+    },
+    "/swagger/index.html": {
+      "get": {
+        "summary": "Swagger 文档",
+        "tags": [
+          "系统"
+        ],
+        "responses": {
+          "200": {
+            "description": "html"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "summary": "登录获取 JWT",
+        "tags": [
+          "认证"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "token": {
+                          "type": "string"
+                        },
+                        "user": {
+                          "$ref": "#/components/schemas/UserResp"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误"
+          },
+          "401": {
+            "description": "未认证"
+          },
+          "403": {
+            "description": "无权限"
+          },
+          "404": {
+            "description": "不存在"
+          },
+          "409": {
+            "description": "业务冲突"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/register": {
+      "post": {
+        "summary": "注册医生账号",
+        "tags": [
+          "认证"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UserResp"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误"
+          },
+          "401": {
+            "description": "未认证"
+          },
+          "403": {
+            "description": "无权限"
+          },
+          "404": {
+            "description": "不存在"
+          },
+          "409": {
+            "description": "业务冲突"
+          }
+        }
+      }
+    },
+    "/api/v1/users": {
+      "get": {
+        "summary": "用户列表（管理员）",
+        "tags": [
+          "用户"
+        ],
+        "security": [
+          {
+            "APIKey": []
+          },
+          {
+            "JWT": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "integer"
+            },
+            "message": {
+              "type": "string"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "list": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserResp"
+                  }
+                },
+                "total": {
+                  "type": "integer"
+                },
+                "page": {
+                  "type": "integer"
+                },
+                "page_size": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "创建用户（管理员）",
+        "tags": [
+          "用户"
+        ],
+        "security": [
+          {
+            "APIKey": []
+          },
+          {
+            "JWT": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UserResp"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误"
+          },
+          "401": {
+            "description": "未认证"
+          },
+          "403": {
+            "description": "无权限"
+          },
+          "404": {
+            "description": "不存在"
+          },
+          "409": {
+            "description": "业务冲突"
+          }
+        }
+      }
+    },
+    "/api/v1/users/{id}": {
+      "put": {
+        "summary": "更新用户（管理员）",
+        "tags": [
+          "用户"
+        ],
+        "security": [
+          {
+            "APIKey": []
+          },
+          {
+            "JWT": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UserResp"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误"
+          },
+          "401": {
+            "description": "未认证"
+          },
+          "403": {
+            "description": "无权限"
+          },
+          "404": {
+            "description": "不存在"
+          },
+          "409": {
+            "description": "业务冲突"
+          }
+        }
+      }
+    },
+    "/api/v1/drugs": {
+      "get": {
+        "summary": "药品列表",
+        "tags": [
+          "药品"
+        ],
+        "security": [
+          {
+            "APIKey": []
+          },
+          {
+            "JWT": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "mechanism",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "integer"
+            },
+            "message": {
+              "type": "string"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "list": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Drug"
+                  }
+                },
+                "total": {
+                  "type": "integer"
+                },
+                "page": {
+                  "type": "integer"
+                },
+                "page_size": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "创建药品（管理员）",
+        "tags": [
+          "药品"
+        ],
+        "security": [
+          {
+            "APIKey": []
+          },
+          {
+            "JWT": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDrugReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Drug"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误"
+          },
+          "401": {
+            "description": "未认证"
+          },
+          "403": {
+            "description": "无权限"
+          },
+          "404": {
+            "description": "不存在"
+          },
+          "409": {
+            "description": "业务冲突"
+          }
+        }
+      }
+    },
+    "/api/v1/drugs/{id}": {
+      "get": {
+        "summary": "药品详情",
+        "tags": [
+          "药品"
+        ],
+        "security": [
+          {
+            "APIKey": []
+          },
+          {
+            "JWT": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Drug"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误"
+          },
+          "401": {
+            "description": "未认证"
+          },
+          "403": {
+            "description": "无权限"
+          },
+          "404": {
+            "description": "不存在"
+          },
+          "409": {
+            "description": "业务冲突"
+          }
+        }
+      },
+      "put": {
+        "summary": "更新药品（管理员）",
+        "tags": [
+          "药品"
+        ],
+        "security": [
+          {
+            "APIKey": []
+          },
+          {
+            "JWT": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDrugReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Drug"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误"
+          },
+          "401": {
+            "description": "未认证"
+          },
+          "403": {
+            "description": "无权限"
+          },
+          "404": {
+            "description": "不存在"
+          },
+          "409": {
+            "description": "业务冲突"
+          }
+        }
+      }
+    },
+    "/api/v1/drugs/{id}/disable": {
+      "post": {
+        "summary": "停用药品（管理员）",
+        "tags": [
+          "药品"
+        ],
+        "security": [
+          {
+            "APIKey": []
+          },
+          {
+            "JWT": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Drug"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误"
+          },
+          "401": {
+            "description": "未认证"
+          },
+          "403": {
+            "description": "无权限"
+          },
+          "404": {
+            "description": "不存在"
+          },
+          "409": {
+            "description": "业务冲突"
+          }
+        }
+      }
+    },
+    "/api/v1/drugs/{id}/enable": {
+      "post": {
+        "summary": "启用药品（管理员）",
+        "tags": [
+          "药品"
+        ],
+        "security": [
+          {
+            "APIKey": []
+          },
+          {
+            "JWT": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Drug"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误"
+          },
+          "401": {
+            "description": "未认证"
+          },
+          "403": {
+            "description": "无权限"
+          },
+          "404": {
+            "description": "不存在"
+          },
+          "409": {
+            "description": "业务冲突"
+          }
+        }
+      }
+    },
+    "/api/v1/interactions": {
+      "get": {
+        "summary": "相互作用规则列表",
+        "tags": [
+          "相互作用"
+        ],
+        "security": [
+          {
+            "APIKey": []
+          },
+          {
+            "JWT": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "risk",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "integer"
+            },
+            "message": {
+              "type": "string"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "list": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InteractionRule"
+                  }
+                },
+                "total": {
+                  "type": "integer"
+                },
+                "page": {
+                  "type": "integer"
+                },
+                "page_size": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "创建相互作用规则（管理员）",
+        "tags": [
+          "相互作用"
+        ],
+        "security": [
+          {
+            "APIKey": []
+          },
+          {
+            "JWT": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateInteractionReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/InteractionRule"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误"
+          },
+          "401": {
+            "description": "未认证"
+          },
+          "403": {
+            "description": "无权限"
+          },
+          "404": {
+            "description": "不存在"
+          },
+          "409": {
+            "description": "业务冲突"
+          }
+        }
+      }
+    },
+    "/api/v1/interactions/{id}": {
+      "delete": {
+        "summary": "删除相互作用规则（管理员）",
+        "tags": [
+          "相互作用"
+        ],
+        "security": [
+          {
+            "APIKey": []
+          },
+          {
+            "JWT": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误"
+          },
+          "401": {
+            "description": "未认证"
+          },
+          "403": {
+            "description": "无权限"
+          },
+          "404": {
+            "description": "不存在"
+          },
+          "409": {
+            "description": "业务冲突"
+          }
+        }
+      }
+    },
+    "/api/v1/prescriptions": {
+      "post": {
+        "summary": "接收电子处方（JSON/XML），自动审核",
+        "tags": [
+          "处方"
+        ],
+        "security": [
+          {
+            "APIKey": []
+          },
+          {
+            "JWT": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitPrescriptionReq"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitPrescriptionReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Prescription"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误"
+          },
+          "401": {
+            "description": "未认证"
+          },
+          "403": {
+            "description": "无权限"
+          },
+          "404": {
+            "description": "不存在"
+          },
+          "409": {
+            "description": "业务冲突"
+          }
+        }
+      },
+      "get": {
+        "summary": "处方列表",
+        "tags": [
+          "处方"
+        ],
+        "security": [
+          {
+            "APIKey": []
+          },
+          {
+            "JWT": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "integer"
+            },
+            "message": {
+              "type": "string"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "list": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PrescriptionListResp"
+                  }
+                },
+                "total": {
+                  "type": "integer"
+                },
+                "page": {
+                  "type": "integer"
+                },
+                "page_size": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/prescriptions/{id}": {
+      "get": {
+        "summary": "处方详情（含明细与报告）",
+        "tags": [
+          "处方"
+        ],
+        "security": [
+          {
+            "APIKey": []
+          },
+          {
+            "JWT": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Prescription"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误"
+          },
+          "401": {
+            "description": "未认证"
+          },
+          "403": {
+            "description": "无权限"
+          },
+          "404": {
+            "description": "不存在"
+          },
+          "409": {
+            "description": "业务冲突"
+          }
+        }
+      }
+    },
+    "/api/v1/prescriptions/{id}/review": {
+      "post": {
+        "summary": "重新审核处方",
+        "tags": [
+          "处方"
+        ],
+        "security": [
+          {
+            "APIKey": []
+          },
+          {
+            "JWT": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Report"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误"
+          },
+          "401": {
+            "description": "未认证"
+          },
+          "403": {
+            "description": "无权限"
+          },
+          "404": {
+            "description": "不存在"
+          },
+          "409": {
+            "description": "业务冲突"
+          }
+        }
+      }
+    },
+    "/api/v1/prescriptions/{id}/override": {
+      "post": {
+        "summary": "医生/药师强制通过警告类处方",
+        "tags": [
+          "处方"
+        ],
+        "security": [
+          {
+            "APIKey": []
+          },
+          {
+            "JWT": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OverrideReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Prescription"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误"
+          },
+          "401": {
+            "description": "未认证"
+          },
+          "403": {
+            "description": "无权限"
+          },
+          "404": {
+            "description": "不存在"
+          },
+          "409": {
+            "description": "业务冲突"
+          }
+        }
+      }
+    },
+    "/api/v1/prescriptions/{id}/report": {
+      "get": {
+        "summary": "按处方查询审核报告",
+        "tags": [
+          "审核报告"
+        ],
+        "security": [
+          {
+            "APIKey": []
+          },
+          {
+            "JWT": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Report"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误"
+          },
+          "401": {
+            "description": "未认证"
+          },
+          "403": {
+            "description": "无权限"
+          },
+          "404": {
+            "description": "不存在"
+          },
+          "409": {
+            "description": "业务冲突"
+          }
+        }
+      }
+    },
+    "/api/v1/prescriptions/{id}/report/export": {
+      "post": {
+        "summary": "导出报告快照到 MinIO",
+        "tags": [
+          "审核报告"
+        ],
+        "security": [
+          {
+            "APIKey": []
+          },
+          {
+            "JWT": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误"
+          },
+          "401": {
+            "description": "未认证"
+          },
+          "403": {
+            "description": "无权限"
+          },
+          "404": {
+            "description": "不存在"
+          },
+          "409": {
+            "description": "业务冲突"
+          }
+        }
+      }
+    },
+    "/api/v1/reports": {
+      "get": {
+        "summary": "审核报告列表",
+        "tags": [
+          "审核报告"
+        ],
+        "security": [
+          {
+            "APIKey": []
+          },
+          {
+            "JWT": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "integer"
+            },
+            "message": {
+              "type": "string"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "list": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Report"
+                  }
+                },
+                "total": {
+                  "type": "integer"
+                },
+                "page": {
+                  "type": "integer"
+                },
+                "page_size": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stats/overview": {
+      "get": {
+        "summary": "审核统计概览",
+        "tags": [
+          "统计"
+        ],
+        "security": [
+          {
+            "APIKey": []
+          },
+          {
+            "JWT": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/StatsOverview"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误"
+          },
+          "401": {
+            "description": "未认证"
+          },
+          "403": {
+            "description": "无权限"
+          },
+          "404": {
+            "description": "不存在"
+          },
+          "409": {
+            "description": "业务冲突"
+          }
+        }
+      }
+    },
+    "/api/v1/audit-logs": {
+      "get": {
+        "summary": "审计日志列表（管理员）",
+        "tags": [
+          "审计"
+        ],
+        "security": [
+          {
+            "APIKey": []
+          },
+          {
+            "JWT": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "username",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "integer"
+            },
+            "message": {
+              "type": "string"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "list": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AuditLog"
+                  }
+                },
+                "total": {
+                  "type": "integer"
+                },
+                "page": {
+                  "type": "integer"
+                },
+                "page_size": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
