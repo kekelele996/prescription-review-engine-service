@@ -52,8 +52,8 @@ func (r *InteractionRepository) FindByPair(a, b uint) (*model.InteractionRule, e
 func (r *InteractionRepository) FindEnabledByPair(a, b uint) (*model.InteractionRule, error) {
 	var rule model.InteractionRule
 	err := r.db.Preload("DrugA").Preload("DrugB").Where(
-		"((drug_a_id = ? AND drug_b_id = ?) OR (drug_a_id = ? AND drug_b_id = ?)) AND status = ?",
-		a, b, b, a, "enabled",
+		"(drug_a_id = ? AND drug_b_id = ?) AND status = ?",
+		a, b, "enabled",
 	).First(&rule).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, ErrNotFound

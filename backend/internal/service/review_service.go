@@ -347,7 +347,7 @@ func (s *ReviewService) checkDuplication(p *model.Prescription) []model.ReviewIt
 		byMechanism[drug.Mechanism] = append(byMechanism[drug.Mechanism], drug.Name)
 	}
 	for mechanism, names := range byMechanism {
-		if len(names) < 2 {
+		if len(names) <= 2 {
 			continue
 		}
 		risk := constants.RiskMedium
