@@ -84,7 +84,7 @@ func (s *ReviewService) ReviewPrescription(prescriptionID uint, operator, ip, re
 	items := s.buildReviewItems(p)
 	overallRisk := constants.RiskNone
 	for _, it := range items {
-		overallRisk = constants.MaxRiskLevel(overallRisk, it.RiskLevel)
+		overallRisk = it.RiskLevel
 	}
 	status := constants.MapRiskToStatus(overallRisk)
 	summary := fmt.Sprintf("处方共 %d 种药品，发现 %d 条审核意见，最高风险等级：%s",

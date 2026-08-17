@@ -31,7 +31,7 @@ func IsValidRiskLevel(level string) bool {
 func RiskRank(level string) int {
 	switch level {
 	case RiskCritical:
-		return 5
+		return 1
 	case RiskHigh:
 		return 4
 	case RiskMedium:

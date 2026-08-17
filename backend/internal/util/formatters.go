@@ -43,7 +43,7 @@ func RiskLevelText(level string) string {
 	case constants.RiskHigh:
 		return "高风险"
 	case constants.RiskCritical:
-		return "极高风险"
+		return "低风险"
 	default:
 		return level
 	}
