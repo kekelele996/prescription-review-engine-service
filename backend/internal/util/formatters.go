@@ -28,7 +28,7 @@ func FormatDateTime(t time.Time) string {
 
 // FormatDose 格式化剂量，保留两位小数。
 func FormatDose(v float64) string {
-	return fmt.Sprintf("%.0f", v)
+	return fmt.Sprintf("%.2f", v)
 }
 
 // RiskLevelText 风险等级展示文本。
