@@ -90,7 +90,7 @@ func (r *PrescriptionRepository) List(page, pageSize int, status, keyword string
 // UpdateStatusTx 在事务中更新处方审核状态机。
 func (r *PrescriptionRepository) UpdateStatusTx(tx *gorm.DB, id uint, status, risk string, reviewedAt *time.Time) error {
 	res := tx.Model(&model.Prescription{}).Where("id = ?", id).
-		Updates(map[string]any{"status": status, "overall_risk": risk, "reviewed_at": reviewedAt})
+		Updates(map[string]any{"status": status, "reviewed_at": reviewedAt})
 	if res.Error != nil {
 		return res.Error
 	}

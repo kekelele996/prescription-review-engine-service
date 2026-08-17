@@ -38,7 +38,7 @@ func frequencyDailyTimes(freq string) float64 {
 	case "bid", "q12h":
 		return 2
 	case "tid", "q8h":
-		return 3
+		return 2
 	case "qid", "q6h":
 		return 4
 	default:
@@ -62,7 +62,7 @@ func ageGroup(age int) string {
 func maxDailyDose(d *model.Drug, age int) float64 {
 	switch ageGroup(age) {
 	case "child":
-		return d.ChildMaxDailyDose
+		return d.AdultMaxDailyDose
 	case "elderly":
 		return d.ElderlyMaxDailyDose
 	default:
