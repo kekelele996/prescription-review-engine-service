@@ -195,9 +195,6 @@ func (s *PrescriptionService) Override(id uint, reason string, operator *util.Cl
 		if err != nil {
 			return err
 		}
-		if p.Status != constants.PrescriptionStatusWarned {
-			return util.NewAppError(http.StatusConflict, fmt.Sprintf(constants.MsgOverrideNotAllowed, p.Status), nil)
-		}
 		p.Status = constants.PrescriptionStatusOverridden
 		p.OverrideReason = reason
 		uid := operator.UserID

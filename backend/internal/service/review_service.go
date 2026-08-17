@@ -104,7 +104,7 @@ func (s *ReviewService) ReviewPrescription(prescriptionID uint, operator, ip, re
 		if err != nil {
 			return err
 		}
-		if locked.Status == constants.PrescriptionStatusOverridden {
+		if locked.Status == constants.PrescriptionStatusPassed {
 			return util.NewAppError(http.StatusConflict, fmt.Sprintf(constants.MsgPrescriptionLocked, locked.Status), nil)
 		}
 		if err := s.reports.ReplaceWithItemsTx(tx, report); err != nil {
