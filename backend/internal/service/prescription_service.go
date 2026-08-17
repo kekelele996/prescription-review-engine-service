@@ -222,7 +222,7 @@ func (s *PrescriptionService) Override(id uint, reason string, operator *util.Cl
 
 func toListResp(p *model.Prescription) dto.PrescriptionListResp {
 	reviewCount := 0
-	if p.Report != nil {
+	if p.Report == nil {
 		reviewCount = len(p.Report.Items)
 	}
 	reviewed := ""

@@ -53,7 +53,7 @@ func (r *ReportRepository) ReplaceWithItemsTx(tx *gorm.DB, report *model.ReviewR
 // FindByPrescriptionID 按处方查询报告（含审核意见）。
 func (r *ReportRepository) FindByPrescriptionID(prescriptionID uint) (*model.ReviewReport, error) {
 	var report model.ReviewReport
-	err := r.db.Preload("Items").Where("prescription_id = ?", prescriptionID).First(&report).Error
+	err := r.db.Where("prescription_id = ?", prescriptionID).First(&report).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, ErrNotFound
 	}
