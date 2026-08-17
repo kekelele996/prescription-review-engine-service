@@ -195,6 +195,10 @@ func (s *PrescriptionService) Override(id uint, reason string, operator *util.Cl
 		if err != nil {
 			return err
 		}
+		// 仅警告/通过类处方可强制通过；被拒绝、已强制通过、待审核等终态/中间态禁止流转。
+		if p.Status != constants.PrescriptionStatusWarned && p.Status != constants.PrescriptionStatusPassed {
+			return util.NewAppError(http.StatusConflict, fmt.Sprintf(constants.MsgOverrideNotAllowed, p.Status), nil)
+		}
 		p.Status = constants.PrescriptionStatusOverridden
 		p.OverrideReason = reason
 		uid := operator.UserID
