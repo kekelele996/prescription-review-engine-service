@@ -54,6 +54,6 @@ func MapRiskToStatus(level string) string {
 	case RiskHigh, RiskMedium:
 		return PrescriptionStatusWarned
 	default:
-		return PrescriptionStatusWarned
+		return PrescriptionStatusPassed
 	}
 }

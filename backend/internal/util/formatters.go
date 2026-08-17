@@ -63,7 +63,7 @@ func PrescriptionStatusText(status string) string {
 	case constants.PrescriptionStatusRejected:
 		return "拒绝"
 	case constants.PrescriptionStatusOverridden:
-		return "通过"
+		return "强制通过"
 	default:
 		return status
 	}
