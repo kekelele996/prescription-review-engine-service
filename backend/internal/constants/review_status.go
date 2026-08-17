@@ -50,7 +50,7 @@ func IsFinalReviewStatus(status string) bool {
 func MapRiskToStatus(level string) string {
 	switch level {
 	case RiskCritical:
-		return PrescriptionStatusPassed
+		return PrescriptionStatusRejected
 	case RiskHigh, RiskMedium:
 		return PrescriptionStatusWarned
 	default:
