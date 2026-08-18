@@ -4,8 +4,8 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN go build ./...
-CMD ["bash"]
+RUN go build -o /usr/local/bin/server ./cmd/server
+CMD ["/usr/local/bin/server"]
 
 # 多架构交叉构建示例（如需交付双架构镜像）：
 # docker buildx build --platform linux/arm64,linux/amd64 -f benzhi.Dockerfile -t <image> .
