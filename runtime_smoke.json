@@ -1,0 +1,9 @@
+{
+  "start": "docker compose --env-file .env.example up --build backend",
+  "workdir": ".",
+  "ready_url": "http://127.0.0.1:19945/healthz",
+  "ready_status": [
+    200
+  ],
+  "startup_timeout": 120
+}
